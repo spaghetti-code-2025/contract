@@ -5,7 +5,9 @@ module myAddress::translation_request {
     use std::error;
     use std::signer;
     use std::vector;
+    use aptos_std::from_bcs::to_u8;
     use aptos_std::table::Table;
+    use aptos_framework::randomness::u16_integer;
 
     use myAddress::translation_request_fund;
 
@@ -15,6 +17,7 @@ module myAddress::translation_request {
         creator_account_id : address,
         content_hash : String,
         total_price: u64,
+        content_length: u64,
     }
 
     struct TranslationRequestTable has key, store{
@@ -36,10 +39,11 @@ module myAddress::translation_request {
         translation_request_key_list.reqeust_ids
     }
 
-    public entry fun create_translation_request(admin: &signer,request_id : String,  reviewer_account_id : address, content_hash : String, total_price : u64) acquires TranslationRequestTable, TranslationRequestKeyList {
+    public entry fun create_translation_request(admin: &signer,request_id : String,  reviewer_account_id : address, content_hash : String, total_price : u64, content_length: u64) acquires TranslationRequestTable, TranslationRequestKeyList {
         let creator_account_id = signer::address_of(admin);
 
         let translation_request_element = TranslationRequestElement{
+            content_length,
             reviewer_account_id,
             creator_account_id,
             content_hash,
