@@ -24,7 +24,7 @@ module myAddress::translation_request_fund {
         resource_signer_cap: account::SignerCapability,
     }
 
-    struct TranslationRequestLockElement has key, store, copy, drop {
+    struct TranslationRequestLockElement has key, store {
         creator_account_id: address,
         original_amount: u64,
         stake: Coin<AptosCoin>
@@ -103,16 +103,14 @@ module myAddress::translation_request_fund {
 
         let lock_table = borrow_global_mut<TranslationRequestLockTable>(resource_addr);
 
-        // get lock element
         let lock_element = table::remove(&mut lock_table.data, request_id);
-
         let total_amount = coin::value(&lock_element.stake);
-
         assert!(total_amount >= target_amount, error::invalid_argument(E_INSUFFICIENT_DEPOSIT));
 
         let target_coin = coin::extract(&mut lock_element.stake, target_amount);
-
         coin::deposit(target_address, target_coin);
+
+        table::add(&mut lock_table.data, request_id, lock_element);
     }
 
     // get locked amount
