@@ -111,7 +111,7 @@ module myAddress::translation_request {
 
         let reviewer_account_id = signer::address_of(admin);
 
-        let translater_account_id = signer::address_of(admin);
+        let translater_account_id = translator_account_id;
 
 
         let translation_request = get_translation_request(request_id, translater_account_id);
