@@ -45,14 +45,14 @@ module myAddress::translation_request {
 
 
     #[view]
-    public entry fun get_all_translation_request(account_id : address) : vector<String> acquires TranslationRequestKeyList {
+    public fun get_all_translation_request(account_id : address) : vector<String> acquires TranslationRequestKeyList {
         assert!(exists<TranslationRequestKeyList>(account_id), error::not_found(ENO_MESSAGE));
         let translation_request_key_list = borrow_global<TranslationRequestKeyList>(account_id);
         translation_request_key_list.reqeust_ids
     }
 
     #[view]
-    public entry fun get_translation_request(request_id: String, account_id: address): TranslationRequestElement acquires TranslationRequestTable {
+    public fun get_translation_request(request_id: String, account_id: address): TranslationRequestElement acquires TranslationRequestTable {
         // Check if TranslationRequestTable exists for the account
         assert!(exists<TranslationRequestTable>(account_id), error::not_found(ENO_MESSAGE));
 
@@ -145,9 +145,14 @@ module myAddress::translation_request {
         let translated_size = end_idx - start_idx;
 
         let price = translation_request.total_price;
-        let translated_price = price * translated_size / total_size;
+        let translated_price = price * translated_size / total_size * 7 / 10;
 
         translation_request_fund::distribute_funds(admin, request_id, translator_account_id, translated_price);
+
+        let lock_amount = translation_request_fund::get_locked_amount(request_id);
+        if (lock_amount <= price * 3 / 10) {
+            translation_request_fund::distribute_funds(admin, request_id, reviewer_account_id, lock_amount);
+        }
     }
 
 }
