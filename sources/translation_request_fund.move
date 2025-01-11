@@ -36,7 +36,7 @@ module myAddress::translation_request_fund {
 
     fun init_module(sender: &signer) {
         let seed = vector::empty<u8>();
-        vector::append(&mut seed, b"TRANSLATION_FUND_RESOURCE_ACCOUNT_SEED1");
+        vector::append(&mut seed, b"TRANSLATION_FUND_RESOURCE_ACCOUNT_SEED11");
 
         // resource account create
         resource_account::create_resource_account(sender, seed, vector::empty<u8>());
