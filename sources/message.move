@@ -17,7 +17,6 @@ module myAddress::message {
   }
 
   public entry fun set_message(admin: &signer, message : String) acquires Message{ 
-    
     let message_owner_address = signer::address_of(admin);
     if (exists<Message>(message_owner_address)) {
       let stored_message = borrow_global_mut<Message>(message_owner_address);
