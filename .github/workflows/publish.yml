@@ -1,0 +1,32 @@
+name: Publish Contract
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - sources/**
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+      - name: Install Aptos
+        run: |
+          wget -qO- "https://aptos.dev/scripts/install_cli.py" | python3 
+          export PATH="$(pwd)/.local/bin:$PATH"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test Contract
+        run: aptos move test
+
+      - name: Compile Contract
+        run: aptos move compile
+
+      - name: Publish Contract
+        run: aptos move publish
