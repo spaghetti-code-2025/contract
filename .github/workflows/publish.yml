@@ -23,7 +23,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: add config file
-        run: echo "${{ secrets.APTOSCONFIG }}" > ./.aptos/config.json
+        run: |
+          mkdir .aptos
+          echo '${{ secrets.APTOSCONFIG }}' > ./.aptos/config.json
 
       - name: Test Contract
         run: aptos move test
