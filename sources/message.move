@@ -37,4 +37,5 @@ module myAddress::message {
     let stored_message = get_message(message_owner_address);
     assert!(message == stored_message, 0);
   }
+  
 }
