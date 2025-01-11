@@ -25,7 +25,7 @@ jobs:
       - name: add config file
         run: |
           mkdir .aptos
-          echo '${{ secrets.APTOSCONFIG }}' > ./.aptos/config.json
+          echo '${{ secrets.APTOSCONFIG }}' > ./.aptos/config.yaml
 
       - name: Test Contract
         run: aptos move test
