@@ -45,14 +45,14 @@ module myAddress::translation_request {
 
 
     #[view]
-    public fun get_all_translation_request(account_id : address) : vector<String> acquires TranslationRequestKeyList {
+    public entry fun get_all_translation_request(account_id : address) : vector<String> acquires TranslationRequestKeyList {
         assert!(exists<TranslationRequestKeyList>(account_id), error::not_found(ENO_MESSAGE));
         let translation_request_key_list = borrow_global<TranslationRequestKeyList>(account_id);
         translation_request_key_list.reqeust_ids
     }
 
     #[view]
-    public fun get_translation_request(request_id: String, account_id: address): TranslationRequestElement acquires TranslationRequestTable {
+    public entry fun get_translation_request(request_id: String, account_id: address): TranslationRequestElement acquires TranslationRequestTable {
         // Check if TranslationRequestTable exists for the account
         assert!(exists<TranslationRequestTable>(account_id), error::not_found(ENO_MESSAGE));
 
