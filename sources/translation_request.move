@@ -6,12 +6,7 @@ module myAddress::translation_request {
     use std::signer;
     use std::hash;
     use std::vector;
-    use aptos_std::string_utils;
     use aptos_std::table::Table;
-    use aptos_framework::account;
-
-    use aptos_framework::coin::{Self as Coin, withdraw};
-    use aptos_framework::aptos_coin::AptosCoin;
 
 
 
@@ -22,7 +17,7 @@ module myAddress::translation_request {
         price : u64,
     }
 
-    struct TranslationRequestTable has key, store, copy, drop{
+    struct TranslationRequestTable has key, store{
         data : Table<String, TranslationRequestElement>,
     }
 
@@ -41,7 +36,7 @@ module myAddress::translation_request {
         translation_request_key_list.reqeust_ids
     }
 
-    public fun create_translation_request(admin: &signer, request_id : String, reviewer_account_id : address, content_hash : String, price : u64) acquires TranslationRequestTable, TranslationRequestKeyList {
+    public fun create_translation_request(admin: &signer, reviewer_account_id : address, content_hash : String, price : u64) acquires TranslationRequestTable, TranslationRequestKeyList {
         let creator_account_id = signer::address_of(admin);
 
         let request_id = string::utf8(hash::sha2_256(*string::bytes(&content_hash)));
@@ -60,7 +55,7 @@ module myAddress::translation_request {
             table::add(&mut translation_request.data, request_id, translation_request_element);
         } else {
             let transactional_request_table = TranslationRequestTable{
-                data : table<String, TranslationRequestElement>::new(),
+                data : table::new<String, TranslationRequestElement>(),
             };
 
             table::add(&mut transactional_request_table.data, request_id, translation_request_element);
@@ -73,16 +68,12 @@ module myAddress::translation_request {
         } else {
 
             let transactional_request_key_list = TranslationRequestKeyList{
-                reqeust_ids : vector<String>::empty()
+                reqeust_ids : vector::empty()
             };
 
             vector::push_back(&mut transactional_request_key_list.reqeust_ids, request_id);
             move_to(admin, transactional_request_key_list);
         }
 
-
     }
-
-
-
 }
