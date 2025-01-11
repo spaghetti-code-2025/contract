@@ -4,17 +4,17 @@ module myAddress::translation_request {
     use std::string::{Self,utf8, String};
     use std::error;
     use std::signer;
-    use std::hash;
     use std::vector;
     use aptos_std::table::Table;
 
+    use myAddress::translation_request_fund;
 
 
     struct TranslationRequestElement has key, store, copy, drop{
         reviewer_account_id : address,
         creator_account_id : address,
         content_hash : String,
-        price : u64,
+        total_price: u64,
     }
 
     struct TranslationRequestTable has key, store{
@@ -36,18 +36,14 @@ module myAddress::translation_request {
         translation_request_key_list.reqeust_ids
     }
 
-    public fun create_translation_request(admin: &signer, reviewer_account_id : address, content_hash : String, price : u64) acquires TranslationRequestTable, TranslationRequestKeyList {
+    public entry fun create_translation_request(admin: &signer,request_id : String,  reviewer_account_id : address, content_hash : String, total_price : u64) acquires TranslationRequestTable, TranslationRequestKeyList {
         let creator_account_id = signer::address_of(admin);
 
-        let request_id = string::utf8(hash::sha2_256(*string::bytes(&content_hash)));
-
-
         let translation_request_element = TranslationRequestElement{
-
             reviewer_account_id,
             creator_account_id,
             content_hash,
-            price,
+            total_price,
         };
 
         if (exists<TranslationRequestTable>(creator_account_id)) {
@@ -73,7 +69,10 @@ module myAddress::translation_request {
 
             vector::push_back(&mut transactional_request_key_list.reqeust_ids, request_id);
             move_to(admin, transactional_request_key_list);
-        }
+        };
+
+        translation_request_fund::lock_funds(admin, total_price, request_id);
+
 
     }
 }

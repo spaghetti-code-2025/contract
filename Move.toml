@@ -6,7 +6,6 @@ authors = []
 [addresses]
 myAddress = "fea525a89594b8459b8101c10801ab4f2f0f287e8c561e873869c51cad8bd1b9"
 
-
 [dev-addresses]
 
 [dependencies.AptosFramework]
