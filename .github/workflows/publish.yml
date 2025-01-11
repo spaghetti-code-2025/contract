@@ -34,4 +34,4 @@ jobs:
         run: aptos move compile
 
       - name: Publish Contract
-        run: aptos move publish
+        run: aptos move publish --assume-yes
