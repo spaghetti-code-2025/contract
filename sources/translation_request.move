@@ -9,7 +9,6 @@ module myAddress::translation_request {
     use aptos_std::table::Table;
     use aptos_framework::account;
     use aptos_framework::randomness::u16_integer;
-    use aptos_framework::timestamp;
 
     use myAddress::translation_request_fund;
 
@@ -20,7 +19,6 @@ module myAddress::translation_request {
         content_hash : String,
         total_price: u64,
         content_length: u64,
-        target_timestamp: u64,
     }
 
     struct TranslationRequestTable has key, store{
@@ -69,7 +67,7 @@ module myAddress::translation_request {
         *table::borrow(&translation_request_table.data, request_id)
     }
 
-    public entry fun create_translation_request(admin: &signer,request_id : String,  reviewer_account_id : address, content_hash : String, total_price : u64, content_length: u64, target_timestamp: u64) acquires TranslationRequestTable, TranslationRequestKeyList {
+    public entry fun create_translation_request(admin: &signer,request_id : String,  reviewer_account_id : address, content_hash : String, total_price : u64, content_length: u64) acquires TranslationRequestTable, TranslationRequestKeyList {
         let creator_account_id = signer::address_of(admin);
 
         let translation_request_element = TranslationRequestElement{
@@ -78,7 +76,6 @@ module myAddress::translation_request {
             creator_account_id,
             content_hash,
             total_price,
-            target_timestamp,
         };
 
         if (exists<TranslationRequestTable>(creator_account_id)) {
@@ -109,16 +106,6 @@ module myAddress::translation_request {
         translation_request_fund::lock_funds(admin, total_price, request_id);
     }
 
-    public entry fun expire_translation_request(admin: &signer, request_id: String) acquires TranslationRequestTable {
-        let translation_request = get_translation_request(request_id, signer::address_of(admin));
-        let now = timestamp::now_microseconds();
-        if (translation_request.target_timestamp < now) {
-            let lock_amount = translation_request_fund::get_locked_amount(request_id);
-            translation_request_fund::distribute_funds(admin, request_id, translation_request.creator_account_id, lock_amount);
-            let translation_request_table = borrow_global_mut<TranslationRequestTable>(signer::address_of(admin));
-            table::remove(&mut translation_request_table.data, request_id);
-        }
-    }
 
     public entry fun accept_translation_pr(admin: &signer, request_id: String, start_idx: u64, end_idx: u64, translated_content_hash: String, translator_account_id: address) acquires TranslationRequestTable, TranslatedContentTable {
 
@@ -158,7 +145,7 @@ module myAddress::translation_request {
         let translated_size = end_idx - start_idx;
 
         let price = translation_request.total_price;
-        let translated_price = (price * translated_size / total_size) * 7 / 10;
+        let translated_price = price * translated_size / total_size * 7 / 10;
 
         translation_request_fund::distribute_funds(admin, request_id, translator_account_id, translated_price);
 
